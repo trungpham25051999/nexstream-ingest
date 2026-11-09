@@ -9,7 +9,10 @@ find_package(nexstream_contracts 0.1 REQUIRED CONFIG)
 find_package(Threads REQUIRED)
 
 add_library(nexstream_ingest_core
+    src/application/protocol_session.cpp
     src/infrastructure/frame_decoder.cpp
+    src/infrastructure/completion_channel.cpp
+    src/infrastructure/auth_completion_channel.cpp
     src/infrastructure/tcp_acceptor.cpp)
 add_library(nexstream::ingest_core ALIAS nexstream_ingest_core)
 target_link_libraries(nexstream_ingest_core PUBLIC nexstream::contracts_validation)
@@ -23,4 +26,10 @@ if(BUILD_TESTING)
     target_include_directories(nexstream_ingest_frame_decoder_tests PRIVATE tests)
     add_test(NAME frame_decoder_unit COMMAND nexstream_ingest_frame_decoder_tests)
     set_tests_properties(frame_decoder_unit PROPERTIES LABELS unit)
+
+    add_executable(nexstream_ingest_protocol_session_tests tests/unit/protocol_session_tests.cpp)
+    target_link_libraries(nexstream_ingest_protocol_session_tests PRIVATE nexstream_ingest_core)
+    target_include_directories(nexstream_ingest_protocol_session_tests PRIVATE tests)
+    add_test(NAME protocol_session_unit COMMAND nexstream_ingest_protocol_session_tests)
+    set_tests_properties(protocol_session_unit PROPERTIES LABELS unit)
 endif()
