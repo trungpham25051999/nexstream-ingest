@@ -13,7 +13,9 @@ add_library(nexstream_ingest_core
     src/infrastructure/frame_decoder.cpp
     src/infrastructure/completion_channel.cpp
     src/infrastructure/auth_completion_channel.cpp
-    src/infrastructure/tcp_acceptor.cpp)
+    src/infrastructure/tcp_acceptor.cpp
+    src/infrastructure/tcp_connection.cpp
+    src/infrastructure/epoll_reactor.cpp)
 add_library(nexstream::ingest_core ALIAS nexstream_ingest_core)
 target_link_libraries(nexstream_ingest_core PUBLIC nexstream::contracts_validation)
 target_include_directories(nexstream_ingest_core PUBLIC include)
@@ -32,4 +34,10 @@ if(BUILD_TESTING)
     target_include_directories(nexstream_ingest_protocol_session_tests PRIVATE tests)
     add_test(NAME protocol_session_unit COMMAND nexstream_ingest_protocol_session_tests)
     set_tests_properties(protocol_session_unit PROPERTIES LABELS unit)
+
+    add_executable(nexstream_ingest_connection_io_tests tests/unit/tcp_connection_io_tests.cpp)
+    target_link_libraries(nexstream_ingest_connection_io_tests PRIVATE nexstream_ingest_core)
+    target_include_directories(nexstream_ingest_connection_io_tests PRIVATE tests)
+    add_test(NAME connection_io_unit COMMAND nexstream_ingest_connection_io_tests)
+    set_tests_properties(connection_io_unit PROPERTIES LABELS unit)
 endif()
