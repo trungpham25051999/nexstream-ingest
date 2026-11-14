@@ -1,0 +1,18 @@
+cmake -S nexstream-contracts -B nexstream-contracts/build-s04 -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=~/nexstream/.local/nexstream-contracts-0.1.0-package
+cmake --build nexstream-contracts/build-s04 --parallel 2
+ctest --test-dir nexstream-contracts/build-s04 --output-on-failure
+cmake --install nexstream-contracts/build-s04
+cmake -S nexstream-contracts/tests/package_consumer -B nexstream-contracts/build-package-consumer -DCMAKE_PREFIX_PATH=~/nexstream/.local/nexstream-contracts-0.1.0-package
+cmake --build nexstream-contracts/build-package-consumer --parallel 2
+./nexstream-contracts/build-package-consumer/package_consumer
+
+cmake -S nexstream-ingest -B nexstream-ingest/build-s04 -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DCMAKE_PREFIX_PATH=~/nexstream/.local/nexstream-contracts-0.1.0-package -DRDKAFKA_ROOT=~/nexstream/.deps/librdkafka-2.0.2
+cmake --build nexstream-ingest/build-s04 --parallel 2
+ctest --test-dir nexstream-ingest/build-s04 --output-on-failure
+cmake --build nexstream-ingest/build-s04-release --parallel 2
+ctest --test-dir nexstream-ingest/build-s04-release --output-on-failure
+cmake --build nexstream-ingest/build-s04-sanitize --parallel 2
+ctest --test-dir nexstream-ingest/build-s04-sanitize --output-on-failure
+
+# Real Redpanda v24.3.18 ran on 127.0.0.1:19092. The broker was stopped/restarted
+# between Publisher calls; the temporary containers were removed after evidence capture.

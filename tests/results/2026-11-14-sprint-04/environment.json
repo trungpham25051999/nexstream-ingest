@@ -1,0 +1,10 @@
+{
+  "date": "2026-11-14",
+  "os": "Linux 6.1.0-40-amd64 x86_64",
+  "compiler": "GCC 12.2.0",
+  "cmake": "3.25.1",
+  "protobuf": "3.21.12",
+  "librdkafka": "2.0.2",
+  "redpanda_image": "docker.redpanda.com/redpandadata/redpanda:v24.3.18",
+  "redpanda_digest": "sha256:5c6c9f2c31ea8db4858be2ee9db1c7635755c7fe6cda9047bdf3380cc3f7754f"
+}
