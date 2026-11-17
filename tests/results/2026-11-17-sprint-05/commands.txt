@@ -1,0 +1,23 @@
+# Prefixes used: installed nexstream_contracts 0.1.0, local librdkafka 2.0.2, local libpq 15.19.
+# NEXSTREAM_POSTGRES_TEST_CONN used an ephemeral local test password and is redacted here.
+cmake -S nexstream-ingest -B nexstream-ingest/build-s05-pg -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DCMAKE_PREFIX_PATH=<contracts-prefix> -DRDKAFKA_ROOT=<rdkafka-prefix> -DLIBPQ_ROOT=<libpq-prefix> -DNEXSTREAM_POSTGRES_TEST_CONN=<redacted-local-test-conninfo>
+cmake --build nexstream-ingest/build-s05-pg --parallel 2
+ctest --test-dir nexstream-ingest/build-s05-pg --output-on-failure
+
+cmake -S nexstream-ingest -B nexstream-ingest/build-s05-release -DCMAKE_BUILD_TYPE=Release <same dependency/test options>
+cmake --build nexstream-ingest/build-s05-release --parallel 2
+ctest --test-dir nexstream-ingest/build-s05-release --output-on-failure
+
+cmake -S nexstream-ingest -B nexstream-ingest/build-s05-sanitize -DCMAKE_BUILD_TYPE=Debug <same options> -DCMAKE_CXX_FLAGS='-fsanitize=address,undefined -fno-omit-frame-pointer' -DCMAKE_EXE_LINKER_FLAGS='-fsanitize=address,undefined'
+cmake --build nexstream-ingest/build-s05-sanitize --parallel 2
+ctest --test-dir nexstream-ingest/build-s05-sanitize --output-on-failure
+
+docker run postgres:16-bookworm <ephemeral local environment and migration mount>
+NEXSTREAM_EXPECT_POSTGRES_UNAVAILABLE=1 ./build-s05-pg/nexstream_ingest_postgres_tests
+docker start nexstream-s05-postgres
+./build-s05-pg/nexstream_ingest_postgres_tests
+
+docker run --rm haproxy:2.9.12-alpine haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
+openssl s_client -connect 127.0.0.1:9443 -servername localhost -CAfile <ephemeral-ca> -verify_hostname localhost -tls1_3
+openssl s_client -connect 127.0.0.1:9443 -servername wrong.example -CAfile <ephemeral-ca> -verify_hostname wrong.example -verify_return_error -tls1_3
+openssl s_client -connect 127.0.0.1:9443 -servername localhost -CAfile <ephemeral-ca> -tls1_2
