@@ -1,5 +1,7 @@
 # nexstream-ingest
 
+[![CI](https://github.com/trungpham25051999/nexstream-ingest/actions/workflows/ci.yml/badge.svg)](https://github.com/trungpham25051999/nexstream-ingest/actions/workflows/ci.yml) ![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus) ![epoll](https://img.shields.io/badge/I%2FO-epoll-555) ![Kafka](https://img.shields.io/badge/Kafka-librdkafka-231F20?logo=apachekafka) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 Sprint 07 container integration: `NEXSTREAM_LISTEN_ADDRESS` overrides the default `127.0.0.1`.
 Use `0.0.0.0` only on the isolated development backend network; no Gateway port is published by Compose.
 
