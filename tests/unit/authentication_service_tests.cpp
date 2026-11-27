@@ -78,7 +78,7 @@ int main() {
     auto expired = credential("expired", "secret"); expired.expires_at = std::chrono::system_clock::now() - 1s;
     registry->values.emplace("expired", expired);
     infra::AuthCompletionChannel channel(512); infra::AuthenticationConfig config;
-    config.worker_count = 4; config.max_queued_attempts = 128; config.cache_ttl = 500ms;
+    config.worker_count = 4; config.max_queued_attempts = 128; config.cache_ttl = 2s;  // well above PBKDF2 cost of the warm-up steps, even under ASan
     config.reconcile_interval = 100ms;
     infra::AuthenticationService service(registry, channel, config);
 
@@ -104,7 +104,7 @@ int main() {
                 "fresh cache remains usable during registry outage");
     test.expect(authenticate(service, channel, 8, "cold-miss", "secret").status == app::AuthStatus::kRetryLater,
                 "cold miss fails closed while registry unavailable");
-    std::this_thread::sleep_for(520ms);
+    std::this_thread::sleep_for(2050ms);
     test.expect(authenticate(service, channel, 9, "key-a", "correct-secret").status == app::AuthStatus::kRetryLater,
                 "expired cache entry fails closed during outage");
 
